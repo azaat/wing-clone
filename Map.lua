@@ -8,9 +8,10 @@ function Map:init(world, points, width)
     self.body = love.physics.newBody(self.world, 0, 0)
     self.shape = love.physics.newChainShape(false, points)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
+
 end
 
 function Map:render()
-    love.graphics.setColor(0.28, 0.63, 0.05)
+    love.graphics.setColor(1, 1, 1)
     love.graphics.line(self.points)
 end
