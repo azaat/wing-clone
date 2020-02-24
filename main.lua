@@ -1,18 +1,25 @@
 Class = require 'class'
 Camera = require 'camera'
+push = require 'push'
 require 'Map'
 require 'Ship'
 require 'Interaction'
 
-WIDTH = 1000
-HEIGHT = 720
+local WIDTH = 1080
+local HEIGHT = 720
+local windowWidth, windowHeight = love.graphics.getDimensions()
 
 function love.load()
-    love.window.setMode(WIDTH, HEIGHT, {
+    push:setupScreen(
+        WIDTH, 
+        HEIGHT, 
+        windowWidth,
+        windowHeight,
+        {
         fullscreen = false,
-        resizable = false,
-        vsync = true
-    })
+        resizable = true
+        }
+    )
 
     world = love.physics.newWorld(0, 0, true)
 
@@ -32,23 +39,27 @@ function love.load()
     }
 
     camera = Camera(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT)
-    camera.scale = 1.5
+    camera.scale = 2
     map = Map(world, level1, 5)
     ship = Ship(world, WIDTH / 2, HEIGHT / 2, 5)
-    interaction = Interaction(world, map, ship)
+    interaction = Interaction(world, map, ship, WIDTH, HEIGHT)
 end
 
 function love.update(dt)
     world:update(dt)
-    interaction:update()
+    interaction:update(dt)
 
     camera:update(dt)
     camera:follow(ship.body:getWorldCenter())
 end
 
 function love.draw()
+    push:start()
+
     camera:attach()
     interaction:render()
     camera:detach()
     camera:draw()
+
+    push:finish()
 end

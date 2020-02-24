@@ -1,10 +1,10 @@
 Ship = Class{}
 
---PHYSICAL PARAMETERS
-TURN_ANGLE = 0.005
-LINEAR_DAMPING = 0.5
-ANGULAR_DAMPING = 5
-SHIP_REST = 0.5
+--Physical parameters
+TURN_ANGLE = 6
+LINEAR_DAMPING = 3
+ANGULAR_DAMPING = 30
+SHIP_REST = 1.1
 
 function Ship:init(world, x, y, dim)
     self.world = world
@@ -16,6 +16,7 @@ function Ship:init(world, x, y, dim)
     self.body:setLinearDamping(LINEAR_DAMPING)
     self.body:setAngularDamping(ANGULAR_DAMPING)
 
+    --Triangular shape of the ship
     self.shape = love.physics.newPolygonShape( - self.dim, self.dim, 
         0, self.dim * 3,
         self.dim, self.dim, 

@@ -1,40 +1,60 @@
 Interaction = Class{}
 
---PHYSICAL PARAMETERS
+--Physical parameters
 RAY_LENGTH = 300
-FORCE = 6
-ADD_FORCE = 3
+FORCE = 88
+ADD_FORCE = 44
 
-function Interaction:init(world, map, ship)
+function Interaction:init(world, map, ship, width, height)
     self.world = world
     self.map = map
     self.ship = ship
+
+    self.width = width
+    self.height = height
+
     self.point1 = {} 
     self.point2 = {}
 end
 
-function Interaction:update()
+function Interaction:update(dt)
     local angle = self.ship.body:getAngle()
-    
+ 
     if love.keyboard.isDown('left') then
-        self.ship.body:setAngle(angle - TURN_ANGLE)
+        self.ship.body:setAngle(angle - TURN_ANGLE * dt)
         angle = angle - TURN_ANGLE
     elseif love.keyboard.isDown('right') then
-        self.ship.body:setAngle(angle + TURN_ANGLE)
+        self.ship.body:setAngle(angle + TURN_ANGLE * dt)
         angle = angle + TURN_ANGLE
+    end  
+    
+    --Mobile controls
+    local touches = love.touch.getTouches()
+ 
+    for i, id in ipairs(touches) do
+        local tx, ty = love.touch.getPosition(id)
+
+        if tx < self.width / 2 then
+            self.ship.body:setAngle(angle - TURN_ANGLE * dt)
+            angle = angle - TURN_ANGLE
+        else
+            self.ship.body:setAngle(angle + TURN_ANGLE * dt)
+            angle = angle + TURN_ANGLE
+        end
     end
 
-    --Applying reactive force to the Player
+    --Applying reactive force to the ship
     local xn, yn, fraction = self:cast(angle)
     self.ship.body:applyForce(FORCE * math.sin(angle),
         - FORCE * math.cos(angle))
     if xn then
-        self.ship.body:applyForce(ADD_FORCE * math.sin(angle) / fraction,
-            - ADD_FORCE * math.cos(angle) / fraction)
+        self.ship.body:applyForce(dt * ADD_FORCE * math.sin(angle) / fraction,
+            - dt * ADD_FORCE * math.cos(angle) / fraction)
     end
 
 end
 
+--Casting a ray from the ship to the walls
 function Interaction:cast(angle)
     self.point1.x, self.point1.y = self.ship.body:getWorldCenter()
     self.point2.x = self.point1.x - RAY_LENGTH * math.sin(angle)
